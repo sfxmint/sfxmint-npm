@@ -47,7 +47,7 @@ test("internal mode keeps self-tests out of the cli channel", async () => {
   await server.close();
 });
 
-test("an API key goes to API calls only, and no key means no header", async () => {
+test("an API key goes to API calls and SFXMint's own files (their daily allowance), and no key means no header", async () => {
   const coin = makeSound("coin-01");
   const server = await startServer({
     "/api/v1/roles/coin": { role: "coin", slug: "coin-01" },
@@ -59,7 +59,7 @@ test("an API key goes to API calls only, and no key means no header", async () =
   await resolveRoles(origin, keyed, ["coin"]);
   await keyed.get(new URL("/dl/coin-01.mp3", origin));
   for (const req of server.requests) {
-    const want = req.path.startsWith("/api/") ? `Bearer sfx_live_${"a".repeat(40)}` : null;
+    const want = req.path.startsWith("/api/") || req.path.startsWith("/dl/") ? `Bearer sfx_live_${"a".repeat(40)}` : null;
     assert.equal(req.authorization, want, `${req.path} authorization`);
   }
   server.requests.length = 0;
@@ -282,4 +282,26 @@ test("an unknown role points at the index instead of failing opaquely", async ()
 test("requires HTTPS outside localhost", () => {
   assert.throws(() => parseOrigin("http://example.com"), /HTTPS is required/);
   assert.doesNotThrow(() => parseOrigin("http://localhost:8787"));
+});
+
+test("past the day's download allowance: nothing is written and the server's words are shown; a signed address is never kept", async () => {
+  const coin = makeSound("coin-01");
+  const message = "Daily keyless download limit reached: 20 sounds a day per network.";
+  const server = await startServer({ "/dl/coin-01.mp3": { status: 429, body: { error: "download_limit", message } } });
+  const out = await mkdtemp(join(tmpdir(), "sfx-limit-"));
+  await assert.rejects(
+    downloadAll(parseOrigin(server.origin), createFetcher(), [{ role: "coin", sound: server.rewrite(coin.sound) }], { format: "mp3", out }),
+    (err) => err.status === 429 && err.message.includes(message),
+  );
+  await assert.rejects(readFile(join(out, "coin.mp3")), { code: "ENOENT" });
+  await server.close();
+
+  const signedServer = await startServer({ "/dl/coin-01.mp3": coin.body });
+  const sound = signedServer.rewrite(coin.sound);
+  sound.mp3_url += "?g=abc.123.sig";
+  const kept = await mkdtemp(join(tmpdir(), "sfx-signed-"));
+  const { manifest } = await downloadAll(parseOrigin(signedServer.origin), createFetcher(), [{ role: "coin", sound }], { format: "mp3", out: kept });
+  assert.equal(manifest.files.coin.source_url, `${signedServer.origin}/dl/coin-01.mp3`);
+  assert.doesNotMatch(await readFile(join(kept, "SOUNDS.md"), "utf8"), /g=/);
+  await signedServer.close();
 });

@@ -118,6 +118,7 @@ With `"env": { "SFXMINT_API_KEY": "sfx_live_…" }` in that block, the tools you
 - **The library is AI-generated** or procedurally synthesized, then loudness-normalized and QC'd. Foley purists will hear it. Nothing is scraped or re-hosted from other libraries.
 - **No music, no voice, no speech.** Sound effects only.
 - **A file check is not a listening check.** The checksum proves you got the bytes the API described. Whether a cue suits your scene is something only a listen in context can tell — the CLI flags cues with no content review.
+- **Downloads have a daily allowance.** Without a key: 20 different sounds a day per network (a second format or a retry of one is not counted again). Set `SFXMINT_API_KEY` to a free account's key for 50 a day; any purchase on the account removes the limit for 30 days. Past it a file answers `429 download_limit`, the CLI stops before writing anything and prints what to do. Listening in a browser is never counted, and the manifest keeps each file's permanent address, never a signed one.
 - **A set can be short a role, and a role can have no file that passes its checks yet.** Either way the CLI downloads the rest and tells you which event has no file yet, rather than failing the whole kit or leaving you to discover it in production.
 
 ## Also available

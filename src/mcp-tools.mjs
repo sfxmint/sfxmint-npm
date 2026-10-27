@@ -163,6 +163,8 @@ export const ACCOUNT_DESCRIPTIONS = {
     "Makes instrumental background music (BGM), including ambient music: 30-second AI-generated CC0 WAV takes, with loop_cut and loop_url when a repeating musical loop was made. Requires an API key and credits or a plan; sound-effect free tries do not apply. The optional enhance adapts the brief with the music writer. Intelligible vocals and lyrics are unsupported. Missing access returns website_url for Studio BGM; payment_required also includes buy_url. Pending takes return an order id and status generating.",
   change_sound:
     "Changes one finished take of a generation this account made, as it is, from what is off in words (any language) or a named action. Returns three versions as CC0 WAV files: a light, medium and strong change, or for a loop three seams. Free: no generation is used and no plan is needed. When the words ask for a different sound rather than a change to this one, it answers no_action with a description for a new generation.",
+  studio_list_link:
+    "Returns one short link to SFXMint Studio for a list of sounds the library lacks (up to 30 short descriptions), with a line for the user: the page lists them ready to make one by one, each heard before paying. Nothing is made or charged here and no API key is needed.",
   start_game_kit:
     "Starts a Game kit from a description of a game or of one scene: SFXMint plans the sounds it needs, to be made as CC0 takes, in the same project the user sees on the website. Planning and listing are free; each sound made uses one of the account's free tries, then one generation from a pass or plan on the account, and with neither nothing is made. Returns kit_id and kit_url; planning takes about 15 seconds.",
   add_kit_sounds:

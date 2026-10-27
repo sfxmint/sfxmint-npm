@@ -60,6 +60,13 @@ function assertDeliverable(role, sound, format) {
   return meta;
 }
 
+/** The address without its signed allowance (g=), as the manifest and SOUNDS.md keep it. */
+function withoutGrant(url) {
+  const out = new URL(url);
+  out.searchParams.delete("g");
+  return out;
+}
+
 /**
  * Fetch, verify and stage one file. Returns the pending write plus its manifest entry;
  * nothing touches disk until every selection has passed.
@@ -108,7 +115,8 @@ async function stage(origin, fetcher, { role, sound }, format, outDir, force) {
       loopable: sound.loopable ?? false,
       sha256: digest,
       bytes: bytes.length,
-      source_url: source.href,
+      // The file's permanent address: a signed g= (an account's download allowance, 48 hours) never goes in a repository.
+      source_url: withoutGrant(source).href,
       page_url: sound.page_url ?? null,
       license: sound.license ?? "CC0-1.0",
       content_check: sound.content_check ?? null,

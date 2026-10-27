@@ -52,8 +52,9 @@ export function createFetcher({ timeoutMs = 30000, internal = false, apiKey = pr
     state.requests++;
     const headers = {};
     if (userAgent) headers["User-Agent"] = userAgent;
-    // Only API and MCP calls carry the key; file URLs are public and may sit on another origin.
-    if (key && (url.pathname.startsWith("/api/") || url.pathname === "/mcp")) {
+    // API and MCP calls carry the key, and so do SFXMint's own files (/dl/: the key's daily download allowance instead
+    // of the network's); a file on another origin never sees it.
+    if (key && (url.pathname.startsWith("/api/") || url.pathname === "/mcp" || (url.pathname.startsWith("/dl/") && /(^|\.)sfxmint\.com$|^localhost$|^127\.0\.0\.1$/.test(url.hostname)))) {
       headers.Authorization = `Bearer ${key}`;
     }
     if (body !== undefined) {
