@@ -214,7 +214,6 @@ export async function resolveSearch(
           ...sound,
           checks: candidate.checks,
           unverified_requirements: candidate.unverified_requirements,
-          content_check: candidate.content_check ?? sound.content_check ?? null,
         },
       },
     ],

@@ -206,9 +206,6 @@ async function main() {
 
   const entries = written.map((file) => manifest.files[file.split(".")[0]]);
   const totalBytes = entries.reduce((sum, e) => sum + e.bytes, 0);
-  const unverified = entries.filter(
-    (e) => e.content_check && e.content_check.status !== "verified",
-  );
 
   const missing = resolved.missingRoles ?? [];
 
@@ -247,11 +244,6 @@ async function main() {
       flags.has("set")
         ? `  Not in this set: ${missing.join(", ")} — those events have no file yet.\n`
         : `  Skipped ${missing.join(", ")}: no file passes its checks yet.\n`,
-    );
-  }
-  if (unverified.length) {
-    process.stdout.write(
-      `  ${unverified.length} cue${unverified.length === 1 ? " has" : "s have"} no content review — preview in context before shipping.\n`,
     );
   }
   process.stdout.write(`

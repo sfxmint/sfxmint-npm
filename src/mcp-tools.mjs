@@ -3,6 +3,7 @@
 // description says only what its tool does and names no other tool, as directories require (98eb9324);
 // the remote server's own descriptions point from one tool to another, so they are not used here.
 
+// The library tools only read: clients can run them without a confirmation prompt.
 export const LIBRARY_TOOLS = [
   {
     "name": "search_sounds",
@@ -47,7 +48,7 @@ export const LIBRARY_TOOLS = [
   },
   {
     "name": "get_role_sound",
-    "description": "Returns a sound for a named event or interaction in an app or game — a button click, purchase success, error beep, level-up, dialogue blip, notification. The role is plain words: role ids (click, success, purchase-success, dialogue-blip, notification…) and common aliases (button click, ka-ching, jump scare, text blip…) are accepted. Returns a qualified candidate for that role when one satisfies the requested constraints, with MP3/WAV URLs, 2-3 alternates and the family page for browsing more. Five core game roles include content_check (verified/unverified/rejected), scoped to scene, role, format and exact file SHA256; unverified previews are not certified suitable. Optional style: crisp (short, bright, dry), soft (darker, gentler), spacious (reverb, longer tail), balanced (default: most typical). Unknown roles return not_found with the full role list; GET https://sfxmint.com/api/v1/roles lists roles with aliases.",
+    "description": "Returns a sound for a named event or interaction in an app or game — a button click, purchase success, error beep, level-up, dialogue blip, notification. The role is plain words: role ids (click, success, purchase-success, dialogue-blip, notification…) and common aliases (button click, ka-ching, jump scare, text blip…) are accepted. Returns a qualified candidate for that role when one satisfies the requested constraints, with MP3/WAV URLs, 2-3 alternates and the family page for browsing more. Optional style: crisp (short, bright, dry), soft (darker, gentler), spacious (reverb, longer tail), balanced (default: most typical). Unknown roles return not_found with the full role list; GET https://sfxmint.com/api/v1/roles lists roles with aliases.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -79,7 +80,8 @@ export const LIBRARY_TOOLS = [
             "wav",
             "mp3",
             "ogg"
-          ]
+          ],
+          "description": "Delivery format the candidate must have (ogg = Ogg Vorbis, only sounds published before 2026-10-14 have it); default MP3 and WAV URLs."
         }
       },
       "required": [
@@ -105,7 +107,7 @@ export const LIBRARY_TOOLS = [
   },
   {
     "name": "get_sound_set",
-    "description": "Returns a coherent set of sounds for an app or game in one call — one sound per role, with format metadata, hashes and stable download URLs. Each file's content_check (verified/unverified/rejected) is bound to the exact role, format and file SHA256; unverified files are not certified suitable. Sets include UI styles, game and app scenarios, acoustic-drum-kit, animal-calls (15 isolated calls), and dungeon-traps (6 isolated mechanisms).",
+    "description": "Returns a coherent set of sounds for an app or game in one call — one sound per role, with format metadata, hashes and stable download URLs. Sets include UI styles, game and app scenarios, acoustic-drum-kit, animal-calls (15 isolated calls), and dungeon-traps (6 isolated mechanisms).",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -145,7 +147,7 @@ export const LIBRARY_TOOLS = [
       }
     }
   }
-];
+].map((tool) => ({ ...tool, annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false } }));
 
 export const LIBRARY_TOOL_NAMES = new Set(LIBRARY_TOOLS.map((tool) => tool.name));
 

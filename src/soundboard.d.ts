@@ -15,11 +15,6 @@ export interface ManifestEntry {
   source_url: string;
   page_url: string | null;
   license: string;
-  /**
-   * Content review status, when the API reported one. A file check confirms bytes,
-   * not that the cue suits your scene — preview it in context.
-   */
-  content_check: { status: string; reason?: string | null } | null;
   unverified_requirements: string[];
 }
 

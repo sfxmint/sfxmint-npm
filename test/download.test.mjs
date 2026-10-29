@@ -131,17 +131,10 @@ test("rejects a checksum mismatch rather than writing the file", async () => {
   await server.close();
 });
 
-test("refuses a rejected candidate and an unmet hard condition", async () => {
+test("refuses an unmet hard condition", async () => {
   const origin = parseOrigin("https://example.com");
   const fetcher = createFetcher();
   const base = makeSound("x-01").sound;
-
-  await assert.rejects(
-    downloadAll(origin, fetcher, [
-      { role: "x", sound: { ...base, content_check: { status: "rejected", reason: "noise" } } },
-    ], { format: "mp3", out: await tmp() }),
-    /marked rejected.*noise/,
-  );
 
   await assert.rejects(
     downloadAll(origin, fetcher, [

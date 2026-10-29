@@ -34,12 +34,6 @@ function assertDeliverable(role, sound, format) {
   if (!ROLE_ID.test(role)) throw new Error(`Invalid role id: ${role}`);
   if (!SLUG.test(sound.slug ?? "")) throw new Error(`Invalid slug for role ${role}`);
 
-  if (sound.content_check?.status === "rejected") {
-    throw new Error(
-      `${role}: candidate ${sound.slug} is marked rejected` +
-        (sound.content_check.reason ? ` (${sound.content_check.reason})` : ""),
-    );
-  }
   const unmet = sound.checks?.filter((c) => c.hard && c.state !== "satisfied") ?? [];
   if (unmet.length) {
     throw new Error(
@@ -119,7 +113,6 @@ async function stage(origin, fetcher, { role, sound }, format, outDir, force) {
       source_url: withoutGrant(source).href,
       page_url: sound.page_url ?? null,
       license: sound.license ?? "CC0-1.0",
-      content_check: sound.content_check ?? null,
       unverified_requirements: sound.unverified_requirements ?? [],
     },
   };
