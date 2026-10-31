@@ -9,10 +9,10 @@
   "homepage": "https://sfxmint.com",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/flreey/sfxmint-npm.git"
+    "url": "git+https://github.com/sfxmint/sfxmint-npm.git"
   },
   "bugs": {
-    "url": "https://github.com/flreey/sfxmint-npm/issues"
+    "url": "https://github.com/sfxmint/sfxmint-npm/issues"
   },
   "keywords": [
     "sound-effects",
