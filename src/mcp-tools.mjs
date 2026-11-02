@@ -7,7 +7,7 @@
 export const LIBRARY_TOOLS = [
   {
     "name": "search_sounds",
-    "description": "Free-text search over the SFXMint library of free CC0 sound effects, by a description of the sound such as 'door slam', 'soft UI confirmation chime' or 'coin pickup'. Hard constraints (duration, loop, format, excluded words) apply to every result. results hold sounds whose text has every word of the query; when there are none, closest lists the nearest sounds that meet every hard constraint, best first, each with missing_terms. library_fit says how well the library covers the request (full, close, weak, none); anything short of full also returns generation options. Returns direct, hotlinkable MP3/WAV URLs and verified OGG (Vorbis) URLs where available — no API key, no attribution required — plus measured acoustics (attack_ms, tail_ms, centroid_hz), character labels like 'bright · punchy · tight', loop/file-QC status, and score/match as ranking evidence only (role = known role default, exact = all words hit, partial = some words hit, semantic = nearest by meaning).",
+    "description": "Free-text search over the SFXMint library of free CC0 sound effects, by a description of the sound such as 'door slam', 'soft UI confirmation chime' or 'coin pickup'. Hard constraints (duration, loop, format, excluded words) apply to every result. results hold sounds whose text has every word of the query; when there are none, closest lists the nearest sounds that meet every hard constraint, best first, each with missing_terms. library_fit says how well the library covers the request (full, close, weak, none); anything short of full also returns generation options. Returns direct, hotlinkable MP3/WAV URLs and verified OGG (Vorbis) URLs where available — no API key, no attribution required — plus acoustics measured from the WAV (onset_ms, peak_ms, audible_ms, attack_ms, tail_ms, centroid_hz, peak_dbfs, rms_dbfs), character labels like 'bright · punchy · tight', loop/file-QC status, and score/match as ranking evidence only (role = known role default, exact = all words hit, partial = some words hit, semantic = nearest by meaning).",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -21,7 +21,7 @@ export const LIBRARY_TOOLS = [
         },
         "limit": {
           "type": "number",
-          "description": "Max results (default 20, max 50)"
+          "description": "Max results (default 10, max 50)"
         },
         "max_duration_ms": {
           "type": "number",
@@ -91,7 +91,7 @@ export const LIBRARY_TOOLS = [
   },
   {
     "name": "get_sound",
-    "description": "Returns full metadata for one sound by slug, including download URLs, per-format SHA-256 and byte counts, description and measured acoustics (attack/tail/brightness + character labels).",
+    "description": "Returns full metadata for one sound by slug, including download URLs, per-format SHA-256 and byte counts, description and acoustics measured from the WAV (silence before the sound, where it peaks, audible length, attack, tail, brightness, levels, character labels).",
     "inputSchema": {
       "type": "object",
       "properties": {
