@@ -156,7 +156,7 @@ export const LIBRARY_TOOL_NAMES = new Set(LIBRARY_TOOLS.map((tool) => tool.name)
 // live list. A tool without an entry here is not listed; scripts/test-pkg-mcp.mjs fails until it has one.
 export const ACCOUNT_DESCRIPTIONS = {
   generate_sound:
-    "Makes a new CC0 sound effect from a description, for the API key's account: up to four AI-generated WAV takes (signed links valid 15 minutes) with SHA-256 and seed, and an OGG link (ogg_url) for each take. Each generation uses one of the account's credits, and one that makes no take is not counted; without any it answers payment_required with buy_url and website_url, the website's page where, with a generation pack, generating is free and only a download spends a credit. Given variations_of, it makes a variation set: four takes close to one finished take, for a game to play at random, with a Godot .tres and a Unity script to save beside the WAVs. When the takes are not ready within about 25 seconds, it returns the order id with status generating.",
+    "Makes a new CC0 sound effect from a description, for the API key's account: up to four AI-generated WAV takes (signed links valid 15 minutes) with SHA-256 and seed, and an OGG link (ogg_url) for each take. Each generation uses one of the account's credits, and one that makes no take is not counted; without any it answers payment_required with buy_url and website_url, the website's page where generating is free with a free account and only a download spends a credit. Given variations_of, it makes a variation set: four takes close to one finished take, for a game to play at random, with a Godot .tres and a Unity script to save beside the WAVs. When the takes are not ready within about 25 seconds, it returns the order id with status generating.",
   get_generation:
     "Returns the status and kind of one of this account's sound-effect, ambience or music generations by its order id, with fresh download links for its finished takes and loop_url when a loop was made.",
   generate_ambience:
@@ -166,7 +166,7 @@ export const ACCOUNT_DESCRIPTIONS = {
   change_sound:
     "Changes one finished take of a generation this account made, as it is, from what is off in words (any language) or a named action. Returns three versions as CC0 WAV files: a light, medium and strong change, or for a loop three seams. Free: no generation is used and no plan is needed. When the words ask for a different sound rather than a change to this one, it answers no_action with a description for a new generation.",
   studio_list_link:
-    "Returns one short link to SFXMint Studio for a list of sounds the library lacks (up to 30 short descriptions), with a line for the user: the page lists them ready to make one by one with a generation pack, each heard before a credit is spent. Nothing is made or charged here and no API key is needed.",
+    "Returns one short link to SFXMint Studio for a list of sounds the library lacks (up to 30 short descriptions), with a line for the user: the page lists them ready to make one by one with a free account, each heard before a credit is spent. Nothing is made or charged here and no API key is needed.",
   start_game_kit:
     "Starts a Game kit from a description of a game or of one scene: SFXMint plans the sounds it needs, to be made as CC0 takes, in the same project the user sees on the website. Planning and listing are free; each sound made uses one generation from a plan on the account, and without one nothing is made. Returns kit_id and kit_url; planning takes about 15 seconds.",
   add_kit_sounds:
