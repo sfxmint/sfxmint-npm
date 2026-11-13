@@ -68,14 +68,15 @@ export function createFetcher({ timeoutMs = 30000, internal = false, apiKey = pr
       headers,
     });
     if (!res.ok) {
-      const detail = await res
-        .json()
-        .then((b) => b?.message || b?.error)
-        .catch(() => null);
+      const reply = await res.json().catch(() => null);
+      // A JSON-RPC refusal (429 call_limit, rate_limited) keeps its message: it says what the user can do.
+      const rpc = reply?.jsonrpc && reply.error && typeof reply.error === "object" ? reply.error : null;
+      const detail = rpc?.message || reply?.message || reply?.error;
       const err = new Error(
         `HTTP ${res.status} ${url.pathname}${detail ? `: ${detail}` : ""}`,
       );
       err.status = res.status;
+      if (rpc) err.remote = rpc;
       throw err;
     }
     return res;
@@ -86,6 +87,9 @@ export function createFetcher({ timeoutMs = 30000, internal = false, apiKey = pr
     (await send(url, { method: "POST", body, timeout })).json();
   return { get, post, json: async (url) => (await get(url)).json(), state, via, hasKey: key !== null };
 }
+
+/** What a limit's answer says to do, without the status line in front of it. */
+export const limitWords = (err) => err.message.replace(/^HTTP \d+ \S+: /, "");
 
 /** Full metadata for one slug, including per-format sha256 and byte counts. */
 async function fetchSound(origin, fetcher, slug) {
@@ -104,13 +108,19 @@ export async function resolveRoles(origin, fetcher, roles, { style } = {}) {
   }
   const selections = [];
   const missingRoles = [];
-  for (const role of roles) {
+  let stopped = null;
+  for (const [index, role] of roles.entries()) {
     let head;
     try {
       head = await fetcher.json(
         apiUrl(origin, `/api/v1/roles/${encodeURIComponent(role)}`, { style }, fetcher.via),
       );
     } catch (err) {
+      // Past the lookups' limit with sounds in hand: go on with those and say what is left.
+      if (err.status === 429 && selections.length) {
+        stopped = { message: limitWords(err), left: roles.slice(index) };
+        break;
+      }
       if (err.status === 404) {
         throw new Error(
           `Unknown role "${role}". Browse ${new URL("/api/v1/roles", origin).href} ` +
@@ -125,7 +135,14 @@ export async function resolveRoles(origin, fetcher, roles, { style } = {}) {
       missingRoles.push(role);
       continue;
     }
-    const sound = await fetchSound(origin, fetcher, head.slug);
+    let sound;
+    try {
+      sound = await fetchSound(origin, fetcher, head.slug);
+    } catch (err) {
+      if (err.status !== 429 || !selections.length) throw err;
+      stopped = { message: limitWords(err), left: roles.slice(index) };
+      break;
+    }
     selections.push({ role, sound: { ...sound, label: head.label } });
   }
   if (!selections.length) {
@@ -133,7 +150,7 @@ export async function resolveRoles(origin, fetcher, roles, { style } = {}) {
       `No file passes its checks yet for: ${missingRoles.join(", ")}. Near matches were not substituted.`,
     );
   }
-  return { selections, missingRoles };
+  return { selections, missingRoles, stopped };
 }
 
 /** Set branch: a coherent kit for one product, as role → sound. */

@@ -272,6 +272,42 @@ test("an unknown role points at the index instead of failing opaquely", async ()
   await server.close();
 });
 
+test("past a limit with files in hand: they are written and it says what is left", async () => {
+  const coin = makeSound("coin-01");
+  const message = "Daily keyless download limit reached: 5 sounds a day per network.";
+  const server = await startServer({ "/dl/coin-01.mp3": coin.body, "/dl/jump-01.mp3": { status: 429, body: { error: "download_limit", message } } });
+  const out = await mkdtemp(join(tmpdir(), "sfx-partial-"));
+  const selections = [
+    { role: "coin", sound: server.rewrite(coin.sound) },
+    { role: "jump", sound: server.rewrite(makeSound("jump-01").sound) },
+    { role: "hit", sound: server.rewrite(makeSound("hit-01").sound) },
+  ];
+  const { written, stopped } = await downloadAll(parseOrigin(server.origin), createFetcher(), selections, { format: "mp3", out });
+  assert.deepEqual(written, ["coin.mp3"]);
+  assert.deepEqual(stopped, { message, left: ["jump", "hit"] });
+  assert.ok((await readFile(join(out, "coin.mp3"))).length > 0);
+  await server.close();
+});
+
+test("past the lookups' limit partway through named roles: the ones found go on, and it says what is left", async () => {
+  const coin = makeSound("coin-01");
+  const message = "Daily limit reached: SFXMint allows 20 lookups and tool calls a day per network.";
+  const server = await startServer({
+    "/api/v1/roles/coin": { slug: "coin-01", label: "Coin" },
+    "/api/v1/sounds/coin-01": coin.sound,
+    "/api/v1/roles/jump": { status: 429, body: { error: "call_limit", message } },
+  });
+  const { selections, stopped } = await resolveRoles(parseOrigin(server.origin), createFetcher(), ["coin", "jump", "hit"]);
+  assert.deepEqual(selections.map((s) => s.role), ["coin"]);
+  assert.deepEqual(stopped, { message, left: ["jump", "hit"] });
+  await server.close();
+
+  // With nothing found yet, the limit's own words are the error.
+  const full = await startServer({ "/api/v1/roles/coin": { status: 429, body: { error: "call_limit", message } } });
+  await assert.rejects(resolveRoles(parseOrigin(full.origin), createFetcher(), ["coin"]), (err) => err.status === 429 && err.message.includes(message));
+  await full.close();
+});
+
 test("requires HTTPS outside localhost", () => {
   assert.throws(() => parseOrigin("http://example.com"), /HTTPS is required/);
   assert.doesNotThrow(() => parseOrigin("http://localhost:8787"));

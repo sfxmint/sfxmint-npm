@@ -61,7 +61,7 @@ function parseArgs(argv) {
 const HELP = `sfxmint ${version} — free CC0 sound effects for apps and games
 
   npx sfxmint add coin jump hit          one file per role, into public/sounds
-  npx sfxmint add --set platformer       a coherent kit for one product
+  npx sfxmint add --set platformer       a whole kit; with no key, the first 5 sounds
   npx sfxmint search "glass break"       free text when no role fits
   npx sfxmint list roles                 browse roles (or: list sets)
   npx sfxmint mcp                        the same library as a local MCP server (stdio)
@@ -69,6 +69,7 @@ const HELP = `sfxmint ${version} — free CC0 sound effects for apps and games
 Options
   --out <dir>          where files land            (default: public/sounds)
   --format <fmt>       ${FORMATS.join(" | ")}                 (default: mp3)
+                       mp3 is free; wav takes a download pack's key; ogg is free, older sounds only
   --style <style>      ${STYLES.join(" | ")}
                        re-ranks a role's family by measured acoustics
   --force              replace an existing file with different content
@@ -84,10 +85,12 @@ Search only
 
 MCP
   sfxmint mcp          stdio server for Claude Code, Cursor, Cline and other agents:
-                       search_sounds, get_role_sound, get_sound, get_sound_set (no key).
-                       With SFXMINT_API_KEY set, the account's generation tools join them.
+                       search_sounds, get_role_sound, get_sound, get_sound_set (free to try with no key).
 
-Everything is CC0 1.0: commercial use, no attribution, no signup, no key.
+Everything is CC0 1.0: commercial use, no attribution.
+No key or signup for 20 lookups and 5 downloads a day. SFXMINT_API_KEY (a free account's key)
+gives 100 lookups and 20 downloads a day (300 a month), and a whole kit takes it. A download pack's key
+removes the limits and adds WAV for 30 days.
 File checks confirm bytes, not suitability — preview each cue in context.
 Docs: https://sfxmint.com/api/docs
 `;
@@ -197,12 +200,16 @@ async function main() {
     resolved = await resolveRoles(origin, fetcher, roles, { style: flags.get("style") });
   }
 
-  const { manifest, written, outDir } = await downloadAll(
+  const { manifest, written, outDir, stopped: stoppedFiles } = await downloadAll(
     origin,
     fetcher,
     resolved.selections,
     { format, out, force: flags.has("force"), version },
   );
+  // Stopped at a limit while looking the roles up, while fetching their files, or both.
+  const stopped = stoppedFiles || resolved.stopped
+    ? { message: (stoppedFiles ?? resolved.stopped).message, left: [...(stoppedFiles?.left ?? []), ...(resolved.stopped?.left ?? [])] }
+    : null;
 
   const entries = written.map((file) => manifest.files[file.split(".")[0]]);
   const totalBytes = entries.reduce((sum, e) => sum + e.bytes, 0);
@@ -217,12 +224,14 @@ async function main() {
           format,
           files: entries,
           missing_roles: missing,
+          ...(stopped ? { stopped_at_limit: stopped } : {}),
           requests: fetcher.state.requests,
         },
         null,
         2,
       ) + "\n",
     );
+    if (stopped) process.exitCode = 1;
     return;
   }
 
@@ -245,6 +254,10 @@ async function main() {
         ? `  Not in this set: ${missing.join(", ")} — those events have no file yet.\n`
         : `  Skipped ${missing.join(", ")}: no file passes its checks yet.\n`,
     );
+  }
+  if (stopped) {
+    process.stderr.write(`\n  Stopped at the limit. Not downloaded: ${stopped.left.join(", ")}\n  ${stopped.message}\n`);
+    process.exitCode = 1;
   }
   process.stdout.write(`
   import { createSoundboard } from "sfxmint";

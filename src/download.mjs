@@ -7,6 +7,7 @@
 import { mkdir, writeFile, readFile } from "node:fs/promises";
 import { resolve, join, sep } from "node:path";
 import { createHash } from "node:crypto";
+import { limitWords } from "./api.mjs";
 
 export const MANIFEST_FILE = "sounds.json";
 export const SOUNDS_FILE = "SOUNDS.md";
@@ -182,8 +183,16 @@ export async function downloadAll(
 ) {
   const outDir = resolve(out);
   const staged = [];
+  let stopped = null;
   for (const selection of selections) {
-    staged.push(await stage(origin, fetcher, selection, format, outDir, force));
+    try {
+      staged.push(await stage(origin, fetcher, selection, format, outDir, force));
+    } catch (err) {
+      // Past a limit with files in hand: they count already, so keep them and say what is left. With none, nothing is written.
+      if (err.status !== 429 || !staged.length) throw err;
+      stopped = { message: limitWords(err), left: selections.slice(staged.length).map((s) => s.role) };
+      break;
+    }
   }
 
   const previous = await readManifest(outDir);
@@ -217,5 +226,5 @@ export async function downloadAll(
       `See ${MANIFEST_FILE} for exact sources, checksums and content-check status.\n`,
   );
 
-  return { manifest, written: staged.map((s) => s.write.file), outDir };
+  return { manifest, written: staged.map((s) => s.write.file), outDir, stopped };
 }

@@ -128,6 +128,18 @@ test("with a key and SFXMint unreachable, tools/list is the library tools until 
   assert.equal((await offline.handle(request(4, "initialize", {}))).result.instructions, INSTRUCTIONS);
 });
 
+test("a refusal past a limit keeps its message, so the agent can pass it on", async () => {
+  const message = "Daily limit reached: SFXMint allows 20 lookups and tool calls a day per network. Pricing: https://sfxmint.com/pricing";
+  const full = await startServer({
+    "/mcp": (_url, rpc) => ({ status: 429, body: { jsonrpc: "2.0", id: rpc.id, error: { code: -32029, message, data: { error: "call_limit" } } } }),
+  });
+  const server = createMcpServer({ origin: full.origin });
+  const reply = await server.handle(request(1, "tools/call", { name: "search_sounds", arguments: { query: "door" } }));
+  assert.equal(reply.error?.code, -32029);
+  assert.equal(reply.error?.message, message, "not a generic try again");
+  await full.close();
+});
+
 test("tools/call forwards the name and arguments and returns the remote result unchanged", async () => {
   const remote = await remoteMcp();
   const server = createMcpServer({ origin: remote.origin, apiKey: "" });

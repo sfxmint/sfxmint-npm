@@ -2,7 +2,7 @@
 
 Lets Claude Code, Cursor, Cline and other MCP clients find sound effects while they write your code. It serves [SFXMint](https://sfxmint.com), a library of 9,400+ AI-generated and procedurally synthesized sound effects for games and apps. Every library file is [CC0 1.0](https://sfxmint.com/license): commercial use, no attribution.
 
-No API key needed. The container speaks MCP over stdio and needs network access to sfxmint.com.
+No API key needed to try. The container speaks MCP over stdio and needs network access to sfxmint.com.
 
 ```bash
 docker run -i --rm flreey/sfxmint-mcp
@@ -42,15 +42,15 @@ Each call goes to the public endpoint at `https://sfxmint.com/mcp`, so results a
 
 ## Limits and API key
 
-File downloads without a key: 20 different sounds a day per network. A free account's API key raises that to 50 a day, and any purchase removes the limit for 30 days. Listening in a browser is never counted.
+Without a key: 20 lookups and tool calls and 5 different sound downloads a day per network. A free account's API key gives 100 calls and 20 downloads a day (300 downloads a month), and a download pack removes the limits and adds WAV for 30 days. Free use is MP3: without a pack a WAV answers `402 wav_needs_pack` with the `mp3_url` to use instead. Listening in a browser is never counted.
 
-To use a key, which also adds the account's generation tools, pass it to the container:
+To use a key, pass it to the container:
 
 ```bash
 docker run -i --rm -e SFXMINT_API_KEY flreey/sfxmint-mcp
 ```
 
-Keys are on the [API keys page](https://sfxmint.com/dashboard/keys); plans are on the [pricing page](https://sfxmint.com/pricing).
+Keys are on the [API keys page](https://sfxmint.com/dashboard/keys); the download pack is on the [pricing page](https://sfxmint.com/pricing).
 
 ## Links
 
