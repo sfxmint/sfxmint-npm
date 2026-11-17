@@ -3,11 +3,11 @@
 // description says only what its tool does and names no other tool, as directories require (98eb9324);
 // the remote server's own descriptions point from one tool to another, so they are not used here.
 
-// The library tools only read: clients can run them without a confirmation prompt.
+// The library tools only read (a listening page is written, nothing of the user's): clients can run them without a confirmation prompt.
 export const LIBRARY_TOOLS = [
   {
     "name": "search_sounds",
-    "description": "Free-text search over the SFXMint library of free CC0 sound effects, by a description of the sound such as 'door slam', 'soft UI confirmation chime' or 'coin pickup'. Hard constraints (duration, loop, format, excluded words) apply to every result. results hold sounds whose text has every word of the query; when there are none, closest lists the nearest sounds that meet every hard constraint, best first, each with missing_terms. library_fit says how well the library covers the request (full, close, weak, none). Returns direct, hotlinkable MP3 and WAV URLs and verified OGG (Vorbis) URLs where available, no attribution required, plus acoustics measured from the WAV (onset_ms, peak_ms, audible_ms, attack_ms, tail_ms, centroid_hz, peak_dbfs, rms_dbfs), character labels like 'bright · punchy · tight', loop/file-QC status, and score/match as ranking evidence only (role = known role default, exact = all words hit, partial = some words hit, semantic = nearest by meaning). Free use is MP3: downloading a WAV takes a download pack, and wav_url without one answers 402 wav_needs_pack with the mp3_url to use.",
+    "description": "Free-text search over the SFXMint library of free CC0 sound effects, by a description of the sound such as 'door slam', 'soft UI confirmation chime' or 'coin pickup'. Hard constraints (duration, loop, format, excluded words) apply to every result. results hold sounds whose text has every word of the query; when there are none, closest lists the nearest sounds that meet every hard constraint, best first, each with missing_terms. library_fit says how well the library covers the request (full, close, weak, none). Returns direct, hotlinkable MP3 and WAV URLs and verified OGG (Vorbis) URLs where available, no attribution required, plus acoustics measured from the WAV (onset_ms, peak_ms, audible_ms, attack_ms, tail_ms, centroid_hz, peak_dbfs, rms_dbfs), character labels like 'bright · punchy · tight', loop/file-QC status, and score/match as ranking evidence only (role = known role default, exact = all words hit, partial = some words hit, semantic = nearest by meaning). Free downloads are WAV or MP3 alike, counted by sound, not format.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -38,7 +38,7 @@ export const LIBRARY_TOOLS = [
             "mp3",
             "ogg"
           ],
-          "description": "Delivery format (ogg = Ogg Vorbis, only sounds published before 2026-10-14 have it); loop=true defaults to WAV when omitted. Downloading a WAV takes a download pack."
+          "description": "Delivery format (ogg = Ogg Vorbis, only sounds published before 2026-10-14 have it); loop=true defaults to WAV when omitted."
         }
       },
       "required": [
@@ -48,7 +48,7 @@ export const LIBRARY_TOOLS = [
   },
   {
     "name": "get_role_sound",
-    "description": "Returns a sound for a named event or interaction in an app or game — a button click, purchase success, error beep, level-up, dialogue blip, notification. The role is plain words: role ids (click, success, purchase-success, dialogue-blip, notification…) and common aliases (button click, ka-ching, jump scare, text blip…) are accepted. Returns a qualified candidate for that role when one satisfies the requested constraints, with MP3 and WAV URLs, 2-3 alternates and the family page for browsing more. Free use is MP3: downloading a WAV takes a download pack, and wav_url without one answers 402 wav_needs_pack with the mp3_url to use. Optional style: crisp (short, bright, dry), soft (darker, gentler), spacious (reverb, longer tail), balanced (default: most typical). Unknown roles return not_found with the full role list; GET https://sfxmint.com/api/v1/roles lists roles with aliases.",
+    "description": "Returns a sound for a named event or interaction in an app or game — a button click, purchase success, error beep, level-up, dialogue blip, notification. The role is plain words: role ids (click, success, purchase-success, dialogue-blip, notification…) and common aliases (button click, ka-ching, jump scare, text blip…) are accepted. Returns a qualified candidate for that role when one satisfies the requested constraints, with MP3 and WAV URLs, 2-3 alternates and the family page for browsing more. Free downloads are WAV or MP3 alike, counted by sound, not format. Optional style: crisp (short, bright, dry), soft (darker, gentler), spacious (reverb, longer tail), balanced (default: most typical). Unknown roles return not_found with the full role list; GET https://sfxmint.com/api/v1/roles lists roles with aliases.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -81,7 +81,7 @@ export const LIBRARY_TOOLS = [
             "mp3",
             "ogg"
           ],
-          "description": "Delivery format the candidate must have (ogg = Ogg Vorbis, only sounds published before 2026-10-14 have it); default MP3 and WAV URLs. Downloading a WAV takes a download pack."
+          "description": "Delivery format the candidate must have (ogg = Ogg Vorbis, only sounds published before 2026-10-14 have it); default MP3 and WAV URLs."
         }
       },
       "required": [
@@ -107,7 +107,7 @@ export const LIBRARY_TOOLS = [
   },
   {
     "name": "get_sound_set",
-    "description": "Returns a coherent set of sounds for an app or game in one call — one sound per role, with format metadata, hashes and stable download URLs. Sets include UI styles, game and app scenarios (fantasy-rpg covers spells, combat, loot, quests and level-up), acoustic-drum-kit, animal-calls (15 isolated calls), and dungeon-traps (6 isolated mechanisms).",
+    "description": "Returns a coherent set of sounds for an app or game in one call — one sound per role, with format metadata, hashes and stable download URLs. Sets include UI styles, game and app scenarios (fantasy-rpg covers spells, combat, loot, quests and level-up), acoustic-drum-kit, animal-calls (15 isolated calls), and dungeon-traps (6 isolated mechanisms). With an API key the answer also has credits: new_sounds (not kept yet) and credits_left on the account.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -118,7 +118,7 @@ export const LIBRARY_TOOLS = [
             "mp3",
             "ogg"
           ],
-          "description": "File format for selection and checks (default MP3, which downloads free; WAV takes a download pack; OGG only among sounds published before 2026-10-14). Legacy urls remains MP3; download_urls follows this format."
+          "description": "File format for selection and checks (default WAV; WAV and MP3 download free alike; OGG only among sounds published before 2026-10-14). Legacy urls remains MP3; download_urls follows this format."
         },
         "set": {
           "type": "string",
@@ -141,14 +141,86 @@ export const LIBRARY_TOOLS = [
             "ai-coding-tool",
             "acoustic-drum-kit",
             "animal-calls",
-            "dungeon-traps"
+            "dungeon-traps",
+            "podcast",
+            "stream-alerts",
+            "presentation",
+            "sci-fi-game",
+            "card-game",
+            "tower-defense",
+            "survival-crafting"
           ],
           "description": "Set id (default ui-crisp). Includes acoustic-drum-kit, animal-calls and dungeon-traps alongside the UI and scenario sets listed in the enum."
         }
       }
     }
+  },
+  {
+    "name": "create_listen_page",
+    "description": "Makes a listening page on SFXMint for sounds chosen for several events of one app or game: the candidates grouped by event, about three each, the recommended one picked first. The person opens the page's link, plays each sound, picks one per event, can leave a note on each and presses Done. The page works for 24 hours; with an API key, only that key's account reads the picks back.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "The project in a few words, shown on the page, e.g. 'Platformer: forest level'"
+        },
+        "events": {
+          "type": "array",
+          "description": "One entry per event",
+          "items": {
+            "type": "object",
+            "properties": {
+              "event": {
+                "type": "string",
+                "description": "The event, e.g. 'jump', 'coin pickup', 'menu click'"
+              },
+              "label": {
+                "type": "string",
+                "description": "Optional: how the page names it"
+              },
+              "sounds": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "1–5 sound slugs to choose from"
+              },
+              "recommended": {
+                "type": "string",
+                "description": "Optional: your pick among sounds (the first when left out)"
+              }
+            },
+            "required": [
+              "event",
+              "sounds"
+            ]
+          }
+        }
+      },
+      "required": [
+        "events"
+      ]
+    },
+    "readOnly": false
+  },
+  {
+    "name": "get_picks",
+    "description": "Reads back the picks of a listening page made with an API key: for each event the sound the person chose and their note, whether they pressed Done, and what downloading each costs today (downloaded today, kept with credits, within the day's free downloads, a download credit, or past both, with a payment link for the person).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "description": "The page's code from create_listen_page"
+        }
+      },
+      "required": [
+        "code"
+      ]
+    }
   }
-].map((tool) => ({ ...tool, annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false } }));
+].map(({ readOnly = true, ...tool }) => ({ ...tool, annotations: { readOnlyHint: readOnly, destructiveHint: false, openWorldHint: false } }));
 
 export const LIBRARY_TOOL_NAMES = new Set(LIBRARY_TOOLS.map((tool) => tool.name));
 

@@ -42,7 +42,7 @@ Each call goes to the public endpoint at `https://sfxmint.com/mcp`, so results a
 
 ## Limits and API key
 
-Without a key: 20 lookups and tool calls and 5 different sound downloads a day per network. A free account's API key gives 100 calls and 20 downloads a day (300 downloads a month), and a download pack removes the limits and adds WAV for 30 days. Free use is MP3: without a pack a WAV answers `402 wav_needs_pack` with the `mp3_url` to use instead. Listening in a browser is never counted.
+Without a key: 20 lookups and tool calls and 5 different sound downloads a day per network. A free account's API key gives 100 calls and 20 downloads a day (300 downloads a month), and download credits (one a sound, never expiring) go past the limits, one credit a sound in every format. Free downloads are WAV or MP3 alike, counted by sound, not format. Listening in a browser is never counted.
 
 To use a key, pass it to the container:
 
@@ -50,7 +50,7 @@ To use a key, pass it to the container:
 docker run -i --rm -e SFXMINT_API_KEY flreey/sfxmint-mcp
 ```
 
-Keys are on the [API keys page](https://sfxmint.com/dashboard/keys); the download pack is on the [pricing page](https://sfxmint.com/pricing).
+Keys are on the [API keys page](https://sfxmint.com/dashboard/keys); download credits are on the [pricing page](https://sfxmint.com/pricing).
 
 ## Links
 

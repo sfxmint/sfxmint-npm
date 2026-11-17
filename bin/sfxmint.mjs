@@ -61,7 +61,7 @@ function parseArgs(argv) {
 const HELP = `sfxmint ${version} — free CC0 sound effects for apps and games
 
   npx sfxmint add coin jump hit          one file per role, into public/sounds
-  npx sfxmint add --set platformer       a whole kit; with no key, the first 5 sounds
+  npx sfxmint add --set platformer       a whole kit; takes SFXMINT_API_KEY
   npx sfxmint search "glass break"       free text when no role fits
   npx sfxmint list roles                 browse roles (or: list sets)
   npx sfxmint mcp                        the same library as a local MCP server (stdio)
@@ -69,7 +69,7 @@ const HELP = `sfxmint ${version} — free CC0 sound effects for apps and games
 Options
   --out <dir>          where files land            (default: public/sounds)
   --format <fmt>       ${FORMATS.join(" | ")}                 (default: mp3)
-                       mp3 is free; wav takes a download pack's key; ogg is free, older sounds only
+                       mp3 and wav are free alike within the daily downloads; ogg is free, older sounds only
   --style <style>      ${STYLES.join(" | ")}
                        re-ranks a role's family by measured acoustics
   --force              replace an existing file with different content
@@ -85,12 +85,12 @@ Search only
 
 MCP
   sfxmint mcp          stdio server for Claude Code, Cursor, Cline and other agents:
-                       search_sounds, get_role_sound, get_sound, get_sound_set (free to try with no key).
+                       search_sounds, get_role_sound, get_sound, get_sound_set (search with no key).
 
 Everything is CC0 1.0: commercial use, no attribution.
-No key or signup for 20 lookups and 5 downloads a day. SFXMINT_API_KEY (a free account's key)
-gives 100 lookups and 20 downloads a day (300 a month), and a whole kit takes it. A download pack's key
-removes the limits and adds WAV for 30 days.
+Searching needs no key or signup (20 lookups a day). Downloads take SFXMINT_API_KEY, a free
+account's key (https://sfxmint.com/dashboard/keys): 100 lookups and 3 downloads a day, as on the
+website. A key with download credits (one a sound in every format, never expiring) goes past the limits.
 File checks confirm bytes, not suitability — preview each cue in context.
 Docs: https://sfxmint.com/api/docs
 `;

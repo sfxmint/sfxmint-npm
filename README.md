@@ -14,7 +14,7 @@ npx sfxmint add coin jump hit
   hit.mp3                1.0s   Cracking Punch Impact 25
 ```
 
-No API key, signup or account to try. Every file is [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/): commercial use, no attribution, no strings.
+Searching needs no API key or account; downloads take a free account's key in `SFXMINT_API_KEY` (make one at https://sfxmint.com/dashboard/keys, no card). Every file is [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/): commercial use, no attribution, no strings.
 
 ## Then play them
 
@@ -43,7 +43,7 @@ Safe to import during SSR — every method is inert until it runs in a browser.
 
 ```bash
 npx sfxmint add coin jump hit         # one file per role
-npx sfxmint add --set platformer      # a whole kit; takes SFXMINT_API_KEY, or the first 5 with no key
+npx sfxmint add --set platformer      # a whole kit; takes SFXMINT_API_KEY (3 sounds a day free; more with download credits)
 npx sfxmint search "glass break"      # free text when no role fits
 npx sfxmint list roles                # browse (or: list sets)
 npx sfxmint mcp                       # the library as a local MCP server (below)
@@ -52,7 +52,7 @@ npx sfxmint mcp                       # the library as a local MCP server (below
 | Option | |
 |---|---|
 | `--out <dir>` | where files land (default `public/sounds`) |
-| `--format <fmt>` | `mp3` (default, free), `ogg` (free, older sounds only), `wav` (takes a download pack's key in `SFXMINT_API_KEY`: lossless, no MP3 delay at the start, clean loops) |
+| `--format <fmt>` | `mp3` (default), `wav` (lossless, no MP3 delay at the start, clean loops) or `ogg` (older sounds only); every format downloads free within the daily allowance |
 | `--style <style>` | `balanced` (default), `crisp`, `soft`, `spacious` — re-ranks a role's family by measured acoustics |
 | `--force` | replace an existing file that has different content |
 | `--json` | machine-readable output |
@@ -79,7 +79,7 @@ Every download is checked against the byte count and SHA-256 the API reports; a 
 npx -y sfxmint mcp
 ```
 
-The same library as a local [MCP](https://modelcontextprotocol.io) server over stdio, so Claude Code, Cursor, Cline or any other MCP client can pick cues while it writes your code. Four tools, free to try with no key:
+The same library as a local [MCP](https://modelcontextprotocol.io) server over stdio, so Claude Code, Cursor, Cline or any other MCP client can pick cues while it writes your code. Six tools; searching needs no key, downloads take a free account's key:
 
 | Tool | For |
 |---|---|
@@ -87,6 +87,8 @@ The same library as a local [MCP](https://modelcontextprotocol.io) server over s
 | `get_sound_set` | a whole kit for one product, one sound per role |
 | `search_sounds` | a description, hard limits (duration, loop, format), or a gap |
 | `get_sound` | exact file metadata for one slug: URLs, SHA-256, measured acoustics |
+| `create_listen_page` | a page for you to hear about three candidates per event, pick one each and leave notes |
+| `get_picks` | what you picked on that page, with what each download costs today (with your key) |
 
 Names, arguments and results are those of the remote server at `https://sfxmint.com/mcp`, which each call goes to; the process just speaks stdio for clients that want a command. It needs Node 20+ and network access to sfxmint.com.
 
@@ -118,12 +120,12 @@ With `"env": { "SFXMINT_API_KEY": "sfx_live_…" }` in that block, every call ca
 - **The library is AI-generated** or procedurally synthesized, then loudness-normalized and QC'd. Foley purists will hear it. Nothing is scraped or re-hosted from other libraries.
 - **No music, no voice, no speech.** Sound effects only.
 - **A file check is not a listening check.** The checksum proves you got the bytes the API described. Whether a cue suits your scene is something only a listen in context can tell.
-- **Use has an allowance.** Without a key: 20 lookups and tool calls and 5 different sound downloads a day per network (a second format or a retry of one is not counted again). Set `SFXMINT_API_KEY` to a free account's key for 100 calls and 20 downloads a day (300 downloads a month); a download pack on the account removes the limits and adds WAV for 30 days. Free use is MP3: without a pack a WAV answers `402 wav_needs_pack` with the `mp3_url` to use instead, though a browser can still play or hotlink it in a page. Past a limit a file answers `429 download_limit` and a call `429 call_limit`; the CLI keeps the files it already got, stops, and prints the limit message and what is left. Listening in a browser is never counted, and the manifest keeps each file's permanent address, never a signed one.
+- **Use has an allowance.** Without a key: 20 lookups and tool calls a day per network, and no downloads. Set `SFXMINT_API_KEY` to a free account's key for 100 calls and 3 different sound downloads a day, the website and the API together (a second format or a retry of one is not counted again); download credits on the account (one a sound, never expiring) go past the limits, one credit a sound in every format. Free downloads are WAV or MP3 alike, counted by sound, not format. Past a limit a file answers `429 download_limit` and a call `429 call_limit`; the CLI keeps the files it already got, stops, and prints the limit message and what is left. Listening to an MP3 in a browser is never counted (a WAV fetched to listen is a download), and the manifest keeps each file's permanent address, never a signed one.
 - **A set can be short a role, and a role can have no file that passes its checks yet.** Either way the CLI downloads the rest and tells you which event has no file yet, rather than failing the whole kit or leaving you to discover it in production.
 
 ## Also available
 
-The same library as a remote [MCP server](https://github.com/sfxmint/sfxmint-mcp) (`https://sfxmint.com/mcp`), or a plain [JSON API](https://sfxmint.com/api/docs), free to try with no key.
+The same library as a remote [MCP server](https://github.com/sfxmint/sfxmint-mcp) (`https://sfxmint.com/mcp`), or a plain [JSON API](https://sfxmint.com/api/docs): search with no key, download with a free one.
 
 **When the library has no fit**, list the sound as missing in your project. SFXMint no longer makes new sounds; new ones join the library from what people search for. An account that already has a plan or credits can still use them in AI Studio on the website, or with its API key: `POST https://sfxmint.com/api/v1/orders`. Any other generation request answers `410 generation_closed`. The `add` and `search` commands do not generate; they need no key for up to 5 sounds a day, and send `SFXMINT_API_KEY` with API requests only when it is set, so they show in your usage.
 
