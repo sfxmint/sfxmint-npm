@@ -127,7 +127,7 @@ With `"env": { "SFXMINT_API_KEY": "sfx_live_…" }` in that block, every call ca
 
 The same library as a remote [MCP server](https://github.com/sfxmint/sfxmint-mcp) (`https://sfxmint.com/mcp`), or a plain [JSON API](https://sfxmint.com/api/docs): search with no key, download with a free one.
 
-**When the library has no fit**, list the sound as missing in your project. SFXMint no longer makes new sounds; new ones join the library from what people search for. An account that already has a plan or credits can still use them in AI Studio on the website, or with its API key: `POST https://sfxmint.com/api/v1/orders`. Any other generation request answers `410 generation_closed`. The `add` and `search` commands do not generate; they need no key for up to 5 sounds a day, and send `SFXMINT_API_KEY` with API requests only when it is set, so they show in your usage.
+**When the library has no fit**, list the sound as missing in your project, or have it made. With `SFXMINT_API_KEY` set, the MCP server also lists `generate_sound` and `get_generation`; `POST https://sfxmint.com/api/v1/orders` does the same over HTTP, and [AI Studio](https://sfxmint.com/studio) on the website. Making a sound uses the account's download credits: 2 a take for every 5 seconds started, and a take that fails costs nothing. Takes come as WAV (16-bit stereo, 44.1 kHz, or 48 kHz with `sample_rate: 48000`, same price), MP3 and OGG. Made sounds are not CC0: use them in your own projects, commercial or not, but don't redistribute them as sound files. The `add` and `search` commands never generate; `search` needs no key, `add` downloads with `SFXMINT_API_KEY`, and both send the key only when it is set, so their calls show in your usage.
 
 ## License
 
