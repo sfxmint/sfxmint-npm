@@ -219,6 +219,23 @@ export const LIBRARY_TOOLS = [
         "code"
       ]
     }
+  },
+  {
+    "name": "check_connect",
+    "description": "Reads a connect request from a download refused without a key (its connect_id): api_key once the user pressed Connect on the link, made on their free account and handed over once; while they have not, status pending with the link and code again. The key goes in the project's .env as SFXMINT_API_KEY and in the header Authorization: Bearer <api_key>.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "connect_id": {
+          "type": "string",
+          "description": "connect_id from the refused download"
+        }
+      },
+      "required": [
+        "connect_id"
+      ]
+    },
+    "readOnly": false
   }
 ].map(({ readOnly = true, ...tool }) => ({ ...tool, annotations: { readOnlyHint: readOnly, destructiveHint: false, openWorldHint: false } }));
 

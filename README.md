@@ -79,7 +79,7 @@ Every download is checked against the byte count and SHA-256 the API reports; a 
 npx -y sfxmint mcp
 ```
 
-The same library as a local [MCP](https://modelcontextprotocol.io) server over stdio, so Claude Code, Cursor, Cline or any other MCP client can pick cues while it writes your code. Six tools; searching needs no key, downloads take a free account's key:
+The same library as a local [MCP](https://modelcontextprotocol.io) server over stdio, so Claude Code, Cursor, Cline or any other MCP client can pick cues while it writes your code. Seven tools; searching needs no key, downloads take a free account's key:
 
 | Tool | For |
 |---|---|
@@ -89,6 +89,7 @@ The same library as a local [MCP](https://modelcontextprotocol.io) server over s
 | `get_sound` | exact file metadata for one slug: URLs, SHA-256, measured acoustics |
 | `create_listen_page` | a page for you to hear about three candidates per event, pick one each and leave notes |
 | `get_picks` | what you picked on that page, with what each download costs today (with your key) |
+| `check_connect` | after a keyless download was refused with a link and code and you pressed Connect on it: the API key it made on your account |
 
 Names, arguments and results are those of the remote server at `https://sfxmint.com/mcp`, which each call goes to; the process just speaks stdio for clients that want a command. It needs Node 20+ and network access to sfxmint.com.
 
@@ -120,7 +121,7 @@ With `"env": { "SFXMINT_API_KEY": "sfx_live_…" }` in that block, every call ca
 - **The library is AI-generated** or procedurally synthesized, then loudness-normalized and QC'd. Foley purists will hear it. Nothing is scraped or re-hosted from other libraries.
 - **No music, no voice, no speech.** Sound effects only.
 - **A file check is not a listening check.** The checksum proves you got the bytes the API described. Whether a cue suits your scene is something only a listen in context can tell.
-- **Use has an allowance.** Without a key: 20 lookups and tool calls a day per network, and no downloads. Set `SFXMINT_API_KEY` to a free account's key for 100 calls and 3 different sound downloads a day, the website and the API together (a second format or a retry of one is not counted again); download credits on the account (one a sound, never expiring) go past the limits, one credit a sound in every format. Free downloads are WAV or MP3 alike, counted by sound, not format. Past a limit a file answers `429 download_limit` and a call `429 call_limit`; the CLI keeps the files it already got, stops, and prints the limit message and what is left. Listening to an MP3 in a browser is never counted (a WAV fetched to listen is a download), and the manifest keeps each file's permanent address, never a signed one.
+- **Use has an allowance.** Without a key: 20 lookups and tool calls a day per network, and no downloads. Set `SFXMINT_API_KEY` to a free account's key for 100 calls and 3 different sound downloads a day, the website and the API together (a second format or a retry of one is not counted again); download credits on the account (one a sound, never expiring) go past the limits, one credit a sound in every format. Free downloads are WAV or MP3 alike, counted by sound, not format. Past a limit a file answers `429 download_limit` and a call `429 call_limit`; without a key, the download refusal carries a link and a short code (`/c/<code>`): sign in there and press Connect, and the agent picks up a key for your account (`check_connect`, or the refusal's `poll_url`) to keep in `.env`; the CLI keeps the files it already got, stops, and prints the limit message and what is left. Listening to an MP3 in a browser is never counted (a WAV fetched to listen is a download), and the manifest keeps each file's permanent address, never a signed one.
 - **A set can be short a role, and a role can have no file that passes its checks yet.** Either way the CLI downloads the rest and tells you which event has no file yet, rather than failing the whole kit or leaving you to discover it in production.
 
 ## Also available

@@ -59,7 +59,7 @@ test("without a key tools/list is the bundled library tools, with no network", a
   const remote = await remoteMcp();
   const server = createMcpServer({ origin: remote.origin, apiKey: "" });
   const reply = await server.handle(request(2, "tools/list"));
-  assert.deepEqual(reply.result.tools.map((t) => t.name), ["search_sounds", "get_role_sound", "get_sound", "get_sound_set", "create_listen_page", "get_picks"]);
+  assert.deepEqual(reply.result.tools.map((t) => t.name), ["search_sounds", "get_role_sound", "get_sound", "get_sound_set", "create_listen_page", "get_picks", "check_connect"]);
   assert.deepEqual(reply.result.tools, LIBRARY_TOOLS);
   assert.equal(remote.requests.length, 0);
   await remote.close();
@@ -225,7 +225,7 @@ test("`sfxmint mcp` speaks newline-delimited JSON-RPC on stdio and exits when st
   assert.equal(lines.length, 5, "one line per reply, none for the notification");
   assert.equal(replies.get(1).result.serverInfo.name, "sfxmint");
   assert.equal(replies.get(null).error.code, -32700);
-  assert.equal(replies.get(2).result.tools.length, 6);
+  assert.equal(replies.get(2).result.tools.length, 7);
   assert.deepEqual(replies.get(3).result, SEARCH_RESULT);
   assert.deepEqual(replies.get(4).result, {});
   await remote.close();
